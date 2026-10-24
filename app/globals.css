@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light mode: white, friendly, high-contrast. Every slate-* utility in the
+     app resolves through these variables (see tailwind.config.ts). */
+  --slate-950: 250 251 252; /* page background */
+  --slate-900: 255 255 255; /* cards */
+  --slate-800: 241 244 246; /* secondary surfaces / hover */
+  --slate-700: 226 231 235; /* borders + 3D edges */
+  --slate-600: 140 150 158;
+  --slate-500: 119 129 137;
+  --slate-400: 90 100 108;  /* muted text */
+  --slate-300: 60 68 74;
+  --slate-200: 40 46 50;
+  --slate-100: 22 27 30;    /* primary text */
+
+  /* Primary (indigo-* utilities): leafy green. */
+  --accent-100: 220 252 231;
+  --accent-200: 187 247 208;
+  --accent-300: 34 160 64;
+  --accent-400: 26 138 52;
+  --accent-500: 62 207 94;
+  --accent-600: 47 179 72;
+  --accent-700: 37 140 56;
+  --accent-fg: 255 255 255;
+
+  /* Secondary (violet-* utilities): sky blue — green→blue gradients. */
+  --accent2-100: 224 242 254;
+  --accent2-200: 186 230 253;
+  --accent2-300: 3 105 161;
+  --accent2-400: 2 132 199;
+  --accent2-500: 34 184 240;
+  --accent2-600: 14 150 205;
+  --accent2-700: 7 115 160;
+}
+
+.dark {
+  /* Dark mode: deep teal-navy instead of pure black — calmer and warmer. */
+  --slate-950: 17 27 33;
+  --slate-900: 23 36 44;
+  --slate-800: 33 49 58;
+  --slate-700: 52 70 81;
+  --slate-600: 82 100 112;
+  --slate-500: 120 138 150;
+  --slate-400: 160 176 186;
+  --slate-300: 206 216 222;
+  --slate-200: 228 234 238;
+  --slate-100: 247 250 252;
+
+  --accent-100: 220 252 231;
+  --accent-200: 187 247 208;
+  --accent-300: 134 239 172;
+  --accent-400: 94 224 122;
+  --accent-500: 62 207 94;
+  --accent-600: 47 179 72;
+  --accent-700: 37 140 56;
+
+  --accent2-100: 224 242 254;
+  --accent2-200: 186 230 253;
+  --accent2-300: 125 211 252;
+  --accent2-400: 56 189 248;
+  --accent2-500: 34 184 240;
+  --accent2-600: 14 150 205;
+  --accent2-700: 7 115 160;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  --font-display: var(--font-body);
+  --font-mono: var(--font-body);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, .font-display {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* Numbers (XP, streaks, scores) use the same rounded font, but aligned. */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgb(var(--accent-500) / 0.35);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(var(--accent2-500));
+  outline-offset: 2px;
+  border-radius: 1rem;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--slate-700)) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgb(var(--slate-700)); border-radius: 999px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@layer components {
+  /* Friendly surfaces: big radius, hairline border, no blur. */
+  .card {
+    @apply rounded-3xl border border-slate-700/80 bg-slate-900;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:bg-slate-800/60;
+  }
+
+  /* "Press me" buttons: a thin darker bottom edge that flattens when pressed. */
+  .btn-primary {
+    @apply bg-accent text-accent-fg font-bold transition-all duration-100
+      hover:brightness-110 active:translate-y-0.5 disabled:opacity-40 disabled:pointer-events-none;
+    box-shadow: 0 2px 0 rgb(var(--accent-700)), 0 8px 20px -10px rgb(var(--accent-500) / 0.6);
+  }
+  .btn-primary:active {
+    box-shadow: 0 0 0 rgb(var(--accent-700));
+  }
+  .btn-ghost {
+    @apply border border-slate-700 bg-slate-900/40 text-slate-200 font-semibold
+      transition-all duration-100 hover:bg-slate-800 active:translate-y-0.5;
+    box-shadow: 0 2px 0 rgb(var(--slate-700));
+  }
+  .btn-ghost:active {
+    box-shadow: 0 0 0 rgb(var(--slate-700));
+  }
+
+  /* Answer / option tiles — same 3D language as the buttons. */
+  .option {
+    @apply rounded-2xl border-2 border-slate-700 bg-slate-900 font-semibold transition-all duration-100
+      hover:bg-slate-800 active:translate-y-0.5
+      disabled:hover:bg-slate-900 disabled:cursor-default;
+    box-shadow: 0 2px 0 rgb(var(--slate-700));
+  }
+  .option-selected {
+    @apply border-violet-500 bg-violet-500/10 text-violet-300;
+    box-shadow: 0 2px 0 rgb(var(--accent2-600));
+  }
+  .option-correct {
+    @apply border-emerald-500 bg-emerald-500/10 text-emerald-300;
+    box-shadow: 0 2px 0 rgb(5 150 105);
+  }
+  .option-wrong {
+    @apply border-rose-500 bg-rose-500/10 text-rose-300;
+    box-shadow: 0 2px 0 rgb(225 29 72);
+  }
+
+  .input {
+    @apply w-full rounded-2xl border-2 border-slate-700 bg-slate-800/60 px-4 py-3 font-semibold outline-none transition
+      placeholder:text-slate-500 focus:border-violet-500 focus:bg-slate-900;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400;
+  }
+
+  .bg-grid {
+    background-image: radial-gradient(rgb(var(--slate-700)) 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+  }
+
+  .animate-in {
+    animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  .animate-wiggle {
+    animation: wiggle 2.5s ease-in-out infinite;
+  }
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

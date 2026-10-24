@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String                @id @default(cuid())
+  email            String                @unique
+  name             String
+  createdAt        DateTime              @default(now())
+  profile          Profile?
+  progress         LessonProgress[]
+  vocabProgress    VocabularyProgress[]
+  conversations    Conversation[]
+  speakingSessions SpeakingSession[]
+  achievements     UserAchievement[]
+  streak           Streak?
+  subscription     Subscription?
+}
+
+model Profile {
+  id            String @id @default(cuid())
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id])
+  level         String @default("A1")
+  goal          String?
+  dailyMinutes  Int    @default(15)
+  xp            Int    @default(0)
+  interfaceLang String @default("ru")
+}
+
+model Lesson {
+  id        String            @id @default(cuid())
+  title     String
+  level     String
+  topic     String
+  order     Int
+  progress  LessonProgress[]
+  exercises Exercise[]
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  percent     Int       @default(0)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+model Vocabulary {
+  id            String                @id @default(cuid())
+  word          String
+  translation   String
+  pronunciation String
+  example       String
+  category      String
+  progress      VocabularyProgress[]
+}
+
+model VocabularyProgress {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  vocabularyId String
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id])
+  status       String     @default("new")
+  lastSeenAt   DateTime   @default(now())
+
+  @@unique([userId, vocabularyId])
+}
+
+model GrammarTopic {
+  id          String     @id @default(cuid())
+  title       String
+  explanation String
+  order       Int
+  exercises   Exercise[]
+}
+
+model Exercise {
+  id             String        @id @default(cuid())
+  lessonId       String?
+  lesson         Lesson?       @relation(fields: [lessonId], references: [id])
+  grammarTopicId String?
+  grammarTopic   GrammarTopic? @relation(fields: [grammarTopicId], references: [id])
+  prompt         String
+  options        String[]
+  correctOption  String
+  attempts       ExerciseAttempt[]
+}
+
+model ExerciseAttempt {
+  id         String   @id @default(cuid())
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  userId     String
+  selected   String
+  correct    Boolean
+  createdAt  DateTime @default(now())
+}
+
+model Conversation {
+  id        String                 @id @default(cuid())
+  userId    String
+  user      User                   @relation(fields: [userId], references: [id])
+  topic     String?
+  createdAt DateTime               @default(now())
+  messages  ConversationMessage[]
+}
+
+model ConversationMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+}
+
+model SpeakingSession {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  pronunciation Int
+  grammar       Int
+  vocabulary    Int
+  fluency       Int
+  createdAt     DateTime @default(now())
+}
+
+model Achievement {
+  id    String            @id @default(cuid())
+  code  String            @unique
+  label String
+  icon  String
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model DailyGoal {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  targetMin Int
+  doneMin   Int      @default(0)
+
+  @@unique([userId, date])
+}
+
+model Streak {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  current      Int      @default(0)
+  longest      Int      @default(0)
+  lastActiveAt DateTime @default(now())
+}
+
+model Subscription {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id])
+  plan     String    @default("free")
+  renewsAt DateTime?
+}
